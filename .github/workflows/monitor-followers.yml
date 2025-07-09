@@ -1,0 +1,48 @@
+name: Monitor X Followers
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # Every 6 hours
+  workflow_dispatch: # Manual trigger
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install playwright
+          playwright install chromium
+          playwright install-deps chromium
+
+      - name: Download previous followers data
+        uses: actions/download-artifact@v4
+        with:
+          name: followers-data
+          path: .
+        continue-on-error: true # First run won't have artifacts
+
+      - name: Run followers monitor
+        run: python main.py
+        env:
+          X_COOKIES: ${{ secrets.X_COOKIES }}
+        continue-on-error: true # Continue even if monitoring fails
+
+      - name: Upload followers data
+        uses: actions/upload-artifact@v4
+        with:
+          name: followers-data
+          path: |
+            followers_data.json
+            followers_history/
+          retention-days: 30
+        if: always() # Upload even if the script fails
