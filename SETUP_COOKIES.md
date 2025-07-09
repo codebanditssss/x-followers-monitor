@@ -26,13 +26,24 @@
    ]
    ```
 
-3. **Add to GitHub Secrets**:
+3. **Add secrets to GitHub**:
 
    - Go to your repository on GitHub
    - Navigate to Settings → Secrets and variables → Actions
+   - Add two secrets:
+
+   **X_COOKIES:**
+
    - Click "New repository secret"
    - Name: `X_COOKIES`
    - Value: Paste your JSON array (minified, all on one line)
+   - Click "Add secret"
+
+   **X_USERNAME:**
+
+   - Click "New repository secret"
+   - Name: `X_USERNAME`
+   - Value: Your X/Twitter username (without @)
    - Click "Add secret"
 
 4. **Test the workflow**:
@@ -43,14 +54,19 @@
 
 ## Security Notes
 
-- Never commit cookies to your repository
+- Never commit cookies or usernames to your repository
 - Rotate cookies periodically
 - GitHub Secrets are encrypted and only exposed to workflows
-- The workflow now loads cookies from the `X_COOKIES` secret
+- The workflow now loads cookies from the `X_COOKIES` secret and username from `X_USERNAME`
 
 ## Local Development
 
-For local testing, you can still use `cookies.json` file. The script will:
+For local testing:
+
+- **Cookies**: Use `cookies.json` file or set `X_COOKIES` environment variable
+- **Username**: Will default to "prathamdby" or set `X_USERNAME` environment variable
+
+The script will:
 
 1. First check for `cookies.json` file
 2. If not found, check for `X_COOKIES` environment variable

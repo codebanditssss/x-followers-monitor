@@ -5,7 +5,7 @@ from datetime import datetime
 import os
 import logging
 
-USERNAME = "prathamdby"
+USERNAME = os.environ.get("X_USERNAME", "prathamdby")
 
 COOKIES_FILE = "cookies.json"
 OUTPUT_FILE = "followers_data.json"
@@ -222,6 +222,7 @@ def extract_username_from_url(url):
 
 def main():
     logger.info("Starting X followers monitor")
+    logger.info(f"Monitoring followers for username: {USERNAME}")
 
     # Ensure necessary directories exist
     os.makedirs(HISTORY_DIR, exist_ok=True)

@@ -38,6 +38,7 @@ jobs:
         run: python main.py
         env:
           X_COOKIES: ${{ secrets.X_COOKIES }}
+          X_USERNAME: ${{ secrets.X_USERNAME }}
 
       - name: Upload followers data
         uses: actions/upload-artifact@v4
