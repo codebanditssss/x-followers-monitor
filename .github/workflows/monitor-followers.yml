@@ -24,25 +24,27 @@ jobs:
           playwright install chromium
           playwright install-deps chromium
 
-      - name: Download previous followers data
-        uses: actions/download-artifact@v4
+      - name: Try to download previous data
+        uses: dawidd6/action-download-artifact@v3
         with:
-          name: followers-data
+          workflow: monitor-followers.yml
+          name: x-followers-data
           path: .
-        continue-on-error: true # First run won't have artifacts
+          if_no_artifact_found: warn
+          search_artifacts: true
+        continue-on-error: true
 
       - name: Run followers monitor
         run: python main.py
         env:
           X_COOKIES: ${{ secrets.X_COOKIES }}
-        continue-on-error: true # Continue even if monitoring fails
 
       - name: Upload followers data
         uses: actions/upload-artifact@v4
         with:
-          name: followers-data
+          name: x-followers-data
           path: |
             followers_data.json
             followers_history/
-          retention-days: 30
-        if: always() # Upload even if the script fails
+          retention-days: 90
+          overwrite: true

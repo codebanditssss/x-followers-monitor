@@ -223,6 +223,10 @@ def extract_username_from_url(url):
 def main():
     logger.info("Starting X followers monitor")
 
+    # Ensure necessary directories exist
+    os.makedirs(HISTORY_DIR, exist_ok=True)
+    logger.info(f"Ensured {HISTORY_DIR} directory exists")
+
     try:
         cookies = load_cookies()
         cookies = [normalize_same_site(cookie) for cookie in cookies]
