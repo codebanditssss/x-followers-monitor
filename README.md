@@ -142,6 +142,7 @@ Each follower entry includes:
 - Keep your cookies secure as they provide access to your X account
 - Regularly update your cookies if authentication fails
 - The script uses a headless browser for security
+- The script uses the selector `div[data-testid="UserCell"]` to locate all user cells. If X (Twitter) changes their frontend, you may need to update this selector in `main.py`.
 
 ## Troubleshooting
 
@@ -149,7 +150,8 @@ Each follower entry includes:
   - Your cookies might be expired
   - Update your cookies data
   - Make sure all required cookies are included
-- If the script stops prematurely:
+- If the script stops prematurely or collects no followers:
+  - X (Twitter) may have changed their frontend. Update the selector in `main.py` (see `CELL_SELECTOR`).
   - Check your internet connection
   - Verify your X account is not rate limited
   - Try running the script again after a few minutes
