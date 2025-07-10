@@ -20,7 +20,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pip install playwright
+          pip install -r requirements.txt
           playwright install chromium
           playwright install-deps chromium
 

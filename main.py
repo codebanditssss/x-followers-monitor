@@ -15,6 +15,7 @@ from datetime import datetime
 import os
 import logging
 import sys
+import requests
 
 # =====================
 # Configurable Constants
@@ -43,6 +44,11 @@ COOKIES_FILE = "cookies.json"
 OUTPUT_FILE = "followers_data.json"
 HISTORY_DIR = "followers_history"
 LATEST_FILE = os.path.join(HISTORY_DIR, "latest.json")
+
+# =====================
+# Webhook Configuration
+# =====================
+DISCORD_WEBHOOK_URL = os.environ.get("DISCORD_WEBHOOK_URL")
 
 # =====================
 # Logging Setup
@@ -156,6 +162,80 @@ def compare_followers(previous_data, current_data):
         "unfollowed_count": len(unfollowed),
         "new_followers_count": len(new_followers),
     }
+
+
+def send_to_discord(changes, username):
+    """Send a summary of follower changes to a Discord webhook."""
+    if not DISCORD_WEBHOOK_URL:
+        logger.debug("Discord webhook URL not set. Skipping notification.")
+        return
+
+    if not changes:
+        logger.debug("No changes to report to Discord.")
+        return
+
+    embeds = []
+
+    # Unfollowed users
+    if changes["unfollowed_count"] > 0:
+        description = "\\n".join(
+            [
+                f"• {user['name']} (@{user['username']})"
+                for user in changes["unfollowed"]
+            ]
+        )
+        embeds.append(
+            {
+                "title": f"❌ {changes['unfollowed_count']} Unfollowed",
+                "description": description,
+                "color": 15158332,  # Red
+            }
+        )
+
+    # New followers
+    if changes["new_followers_count"] > 0:
+        description = "\\n".join(
+            [
+                f"• {user['name']} (@{user['username']})"
+                for user in changes["new_followers"]
+            ]
+        )
+        embeds.append(
+            {
+                "title": f"🎉 {changes['new_followers_count']} New Followers",
+                "description": description,
+                "color": 3066993,  # Green
+            }
+        )
+
+    # Net change
+    net_change = changes["new_followers_count"] - changes["unfollowed_count"]
+    if net_change > 0:
+        net_change_text = f"📈 Net Gain: +{net_change}"
+        net_color = 3066993  # Green
+    elif net_change < 0:
+        net_change_text = f"📉 Net Loss: {net_change}"
+        net_color = 15158332  # Red
+    else:
+        net_change_text = "➖ No Net Change"
+        net_color = 8359053  # Grey
+
+    embeds.append(
+        {"title": net_change_text, "color": net_color}
+    )
+
+    data = {
+        "username": "X Followers Monitor",
+        "avatar_url": "https://developers.elementor.com/docs/assets/img/elementor-placeholder-image.png",
+        "embeds": embeds,
+    }
+
+    try:
+        response = requests.post(DISCORD_WEBHOOK_URL, json=data)
+        response.raise_for_status()
+        logger.info("Successfully sent notification to Discord.")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Error sending notification to Discord: {e}")
 
 
 def save_progress(follower_data, username):
@@ -391,6 +471,9 @@ def main():
                             logger.info(f"📉 Net loss: {net_change} followers")
                         else:
                             logger.info("➖ No net change in followers")
+                        
+                        send_to_discord(changes, username)
+
                 else:
                     logger.info("First run - no previous data to compare")
 

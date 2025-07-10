@@ -39,7 +39,7 @@ A Python tool to monitor your X (formerly Twitter) followers, track who unfollow
 
 3. Install required packages:
    ```bash
-   pip install playwright
+   pip install -r requirements.txt
    playwright install chromium
    playwright install-deps chromium
    ```
@@ -72,6 +72,7 @@ You can run this tool either locally or using GitHub Actions. Choose one of the 
    - Add the following secrets:
      - `X_COOKIES`: Paste your copied JSON cookies data here (make sure you used "Export as JSON")
      - `X_USERNAME`: Your X username (without @ symbol)
+     - `DISCORD_WEBHOOK_URL` (Optional): Your Discord webhook URL for notifications.
 
 ## Usage
 
@@ -89,6 +90,13 @@ You can run this tool either locally or using GitHub Actions. Choose one of the 
      set X_USERNAME=your_username_here
      # Linux/macOS
      export X_USERNAME=your_username_here
+     ```
+   - (Optional) Set your Discord webhook URL:
+     ```bash
+     # Windows
+     set DISCORD_WEBHOOK_URL=your_webhook_url
+     # Linux/macOS
+     export DISCORD_WEBHOOK_URL=your_webhook_url
      ```
 
 2. Run the script:
