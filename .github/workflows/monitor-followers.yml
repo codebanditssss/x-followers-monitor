@@ -39,6 +39,7 @@ jobs:
         env:
           X_COOKIES: ${{ secrets.X_COOKIES }}
           X_USERNAME: ${{ secrets.X_USERNAME }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
 
       - name: Upload followers data
         uses: actions/upload-artifact@v4

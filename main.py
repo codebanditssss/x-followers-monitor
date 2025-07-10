@@ -182,14 +182,21 @@ def send_to_discord(changes, username):
 
     embeds = []
 
+    # Helper to format user lists with proper newlines and length limits
+    MAX_EMBED_DESC_LENGTH = 4000  # Discord embed description limit is 4096 characters
+
+    def _format_users(users):
+        """Return a newline-separated bullet list truncated to Discord limits."""
+        lines = [f"• {u['name']} (@{u['username']})" for u in users]
+        description = "\n".join(lines)
+        # Truncate long descriptions to stay within Discord limits (safety margin)
+        if len(description) > MAX_EMBED_DESC_LENGTH:
+            description = description[: MAX_EMBED_DESC_LENGTH - 3] + "..."
+        return description
+
     # Unfollowed users
     if changes["unfollowed_count"] > 0:
-        description = "\\n".join(
-            [
-                f"• {user['name']} (@{user['username']})"
-                for user in changes["unfollowed"]
-            ]
-        )
+        description = _format_users(changes["unfollowed"])
         embeds.append(
             {
                 "title": f"❌ {changes['unfollowed_count']} Unfollowed",
@@ -200,12 +207,7 @@ def send_to_discord(changes, username):
 
     # New followers
     if changes["new_followers_count"] > 0:
-        description = "\\n".join(
-            [
-                f"• {user['name']} (@{user['username']})"
-                for user in changes["new_followers"]
-            ]
-        )
+        description = _format_users(changes["new_followers"])
         embeds.append(
             {
                 "title": f"🎉 {changes['new_followers_count']} New Followers",
