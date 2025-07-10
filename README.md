@@ -2,172 +2,110 @@
 
 A Python tool to monitor your X (formerly Twitter) followers, track who unfollows you, and maintain a history of follower changes. Can be run locally or automated using GitHub Actions.
 
-## Features
+---
 
-- Track followers and their changes over time
-- Store follower history with timestamps
-- Detect new followers and unfollowers
-- Export data in JSON format
-- Headless browser automation using Playwright
-- GitHub Actions integration for automated monitoring
-- Supports both local and environment-based configuration
+## 🚀 Quickstart Tutorial
 
-## Prerequisites
+### 1. Clone the Repository
 
-- Python 3.7 or higher
-- Git
-- A valid X (Twitter) account
+```bash
+git clone https://github.com/prathamdby/x-followers-monitor.git
+cd x-followers-monitor
+```
 
-## Installation
+### 2. Create and Activate a Virtual Environment
 
-1. Clone the repository:
+```bash
+python -m venv venv
+# On Windows:
+.\venv\Scripts\activate
+# On macOS/Linux:
+source venv/bin/activate
+```
 
-   ```bash
-   git clone https://github.com/yourusername/x-followers-monitor.git
-   cd x-followers-monitor
-   ```
+### 3. Install Dependencies
 
-2. Create and activate a virtual environment:
+```bash
+pip install -r requirements.txt
+playwright install chromium
+playwright install-deps chromium
+```
 
-   ```bash
-   python -m venv venv
-   # On Windows:
-   .\venv\Scripts\activate
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
+### 4. Obtain X (Twitter) Cookies
 
-3. Install required packages:
-   ```bash
-   pip install -r requirements.txt
-   playwright install chromium
-   playwright install-deps chromium
-   ```
+- Install the [Cookie-Editor](https://cookie-editor.cgagnier.ca/) browser extension.
+- Log into X (Twitter) in your browser.
+- Use Cookie-Editor to export cookies as JSON.
+- Save them as `cookies.json` in the project root **OR** set as an environment variable (see below).
 
-## Setup Options
+### 5. Set Environment Variables
 
-You can run this tool either locally or using GitHub Actions. Choose one of the following setup methods:
+- **Required:**
+  - `X_USERNAME`: Your X (Twitter) username (without @)
+  - `X_COOKIES`: Paste your cookies JSON as a string (must be exported as JSON from Cookie-Editor)
+- **Optional:**
+  - `DISCORD_WEBHOOK_URL`: Your Discord webhook URL to receive follower updates
 
-### Option 1: Local Setup with cookies.json
+**Example (Windows):**
 
-1. Install Cookie-Editor extension for your browser:
+```bash
+set X_USERNAME=your_username
+set X_COOKIES={...your_cookies_json...}
+set DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook_url
+```
 
-   - [Chrome](https://chrome.google.com/webstore/detail/cookie-editor/hlkenndednhfkekhgcdicdfddnkalmdm)
-   - [Firefox](https://addons.mozilla.org/firefox/addon/cookie-editor/)
-   - [Edge](https://microsoftedge.microsoft.com/addons/detail/cookieeditor/neaplmfkghagebokkhpjpoebhdledlfi)
-   - [Safari](https://apps.apple.com/app/cookie-editor/id6446215341)
-   - [Opera](https://addons.opera.com/extensions/details/cookie-editor/)
+**Example (macOS/Linux):**
 
-2. Log into X (Twitter) in your browser
-3. Click on the Cookie-Editor extension icon in your browser toolbar
-4. Click "Export" and select "Export as JSON" (this copies all cookies to clipboard in JSON format)
-5. Create a new file named `cookies.json` in the project root directory
-6. Paste the copied JSON cookies into `cookies.json`
+```bash
+export X_USERNAME=your_username
+export X_COOKIES='{...your_cookies_json...}'
+export DISCORD_WEBHOOK_URL=https://discord.com/api/webhooks/your_webhook_url
+```
 
-### Option 2: Environment Variables Setup (Recommended for GitHub Actions)
+### 6. Run the Script
 
-1. Get your X cookies using Cookie-Editor (follow steps 1-4 from Option 1)
-2. In your GitHub repository:
-   - Go to Settings > Secrets and Variables > Actions
-   - Add the following secrets:
-     - `X_COOKIES`: Paste your copied JSON cookies data here (make sure you used "Export as JSON")
-     - `X_USERNAME`: Your X username (without @ symbol)
-     - `DISCORD_WEBHOOK_URL` (Optional): Your Discord webhook URL for notifications.
+```bash
+python main.py
+```
 
-## Usage
+---
 
-### Local Usage
+## 🔔 Discord Webhook Integration
 
-1. Set your X username in one of two ways:
+- If you set the `DISCORD_WEBHOOK_URL` environment variable, the script will post follower changes to your Discord channel after each run.
+- The webhook message includes new followers, unfollowers, and net change.
+- You can create a webhook in your Discord server settings (Server Settings > Integrations > Webhooks > New Webhook).
 
-   - Edit `main.py` and update the USERNAME variable:
-     ```python
-     USERNAME = "your_username_here"
-     ```
-   - Or set the X_USERNAME environment variable:
-     ```bash
-     # Windows
-     set X_USERNAME=your_username_here
-     # Linux/macOS
-     export X_USERNAME=your_username_here
-     ```
-   - (Optional) Set your Discord webhook URL:
-     ```bash
-     # Windows
-     set DISCORD_WEBHOOK_URL=your_webhook_url
-     # Linux/macOS
-     export DISCORD_WEBHOOK_URL=your_webhook_url
-     ```
+---
 
-2. Run the script:
-   ```bash
-   python main.py
-   ```
+## 🛠️ Advanced: GitHub Actions Setup
 
-### GitHub Actions Usage
+1. Go to your repository's **Settings > Secrets and Variables > Actions**.
+2. Add the following secrets (all required except webhook):
+   - `X_COOKIES`: Your cookies JSON string (required)
+   - `X_USERNAME`: Your X username (required)
+   - `DISCORD_WEBHOOK_URL` (optional): Your Discord webhook URL
+3. The workflow will run automatically every 6 hours or can be triggered manually from the Actions tab.
 
-1. The workflow is already configured to run automatically every 6 hours
-2. You can also trigger it manually:
-   - Go to your repository's Actions tab
-   - Select "Monitor X Followers" workflow
-   - Click "Run workflow"
+---
 
-## Output Files
-
-The script generates the following files:
+## 📦 Output Files
 
 - `followers_data.json`: Current snapshot of your followers
 - `followers_history/`: Directory containing historical data
   - `latest.json`: Most recent follower data
   - `followers_YYYYMMDD_HHMMSS.json`: Timestamped snapshots
 
-When using GitHub Actions:
+---
 
-- Data is saved as workflow artifacts
-- Artifacts are retained for 90 days
-- Each run updates the existing artifacts
+## 📝 Notes
 
-## Understanding the Output
+- Never commit your `cookies.json` file or secrets to version control.
+- If you see login errors, refresh your cookies.
+- If selectors break, X (Twitter) may have changed their frontend; update selectors in `main.py`.
 
-The script provides detailed information about follower changes:
-
-- Total follower count
-- New followers since last run
-- Users who unfollowed since last run
-- Net change in followers
-- Timestamps for tracking
-
-Each follower entry includes:
-
-- Display name
-- Username
-- Profile URL
-
-## Security Notes
-
-- Never commit your `cookies.json` file to version control
-- When using GitHub Actions, always use repository secrets
-- Keep your cookies secure as they provide access to your X account
-- Regularly update your cookies if authentication fails
-- The script uses a headless browser for security
-- The script uses the selector `div[data-testid="cellInnerDiv"]` to locate all user cells. If X (Twitter) changes their frontend, you may need to update this selector in `main.py`.
-
-## Troubleshooting
-
-- If you see "Not logged in properly" error:
-  - Your cookies might be expired
-  - Update your cookies data
-  - Make sure all required cookies are included
-- If the script stops prematurely or collects no followers:
-  - X (Twitter) may have changed their frontend. Update the selector in `main.py` (see `CELL_SELECTOR`).
-  - Check your internet connection
-  - Verify your X account is not rate limited
-  - Try running the script again after a few minutes
-
-## Contributing
-
-Feel free to open issues or submit pull requests with improvements.
+---
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT

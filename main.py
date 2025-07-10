@@ -75,6 +75,12 @@ if not USERNAME:
     logger.error("X_USERNAME environment variable is required. Exiting.")
     sys.exit(1)
 
+# Check for X_COOKIES or cookies.json
+COOKIES_ENV = os.environ.get("X_COOKIES")
+if not COOKIES_ENV and not os.path.exists(COOKIES_FILE):
+    logger.error("X_COOKIES environment variable or cookies.json file is required. Exiting.")
+    sys.exit(1)
+
 
 def load_cookies():
     """Load cookies from file (UTF-8) or environment variable (JSON string)."""
