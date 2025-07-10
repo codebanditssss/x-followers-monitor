@@ -21,7 +21,7 @@ import sys
 # =====================
 
 # Selectors (update if X changes their frontend)
-CELL_SELECTOR = "div[data-testid=\"UserCell\"]"
+CELL_SELECTOR = "div[data-testid=\"cellInnerDiv\"]"
 NAME_SELECTOR = (
     "a[role=\"link\"] span.css-1jxf684.r-dnmrzs.r-1udh08x.r-1udbk01.r-3s2u2q.r-bcqeeo.r-1ttztb7.r-qvutc0.r-poiln3 > span"
 )
